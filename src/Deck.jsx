@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "./Card";
 
 const BASE_DECK_API_URL = "https://deckofcardsapi.com/api/deck/";
@@ -24,15 +24,17 @@ function Deck() {
     const data = await response.json();
     setDeckId(data.deck_id);
   }
-
-  async function drawCard(numOfcards = 1) {
-    const count = numOfcards;
-    const response = await fetch(`${BASE_DECK_API_URL}draw/?count=${count}`);
+  async function drawCard() {
+    const response = await fetch(`${BASE_DECK_API_URL}${deckId}/draw/?count=1`);
     const data = await response.json();
-
     setCards((currentCards) => [...currentCards, ...data.cards]);
-  } // TODO: ask about possibly storing the last cards in its own state
+  }
 
+  // TODO: ask about possibly storing the last cards in its own state
+
+
+  // TODO: should we be using useEffect also for the deckId?
+  // only once on mount, use useEffect
   if (deckId === null) {
     fetchDeckId();
     return <p>Loading...</p>;
@@ -40,11 +42,13 @@ function Deck() {
 
   return (
     <div>
-      <div>
-        {cards.map((card) => (
-          <Card imageUrl={card.image} key={card.code} />
-        ))}
-      </div>
+      {cards.length !== 0 &&
+        <div>
+          {cards.map((card) => (
+            <Card imageUrl={card.image} key={card.code} />
+          ))}
+        </div>
+      }
       <div>
         <button onClick={drawCard}>Draw</button>
       </div>
